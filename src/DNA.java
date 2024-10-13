@@ -11,12 +11,20 @@
  */
 
 public class DNA {
+    private static final int A = 1;
+    private static final int C = 2;
+    private static final int G = 3;
+    private static final int T = 4;
+
 
     /**
      * TODO: Complete this function, STRCount(), to return longest consecutive run of STR in sequence.
      */
     public static int STRCount(String sequence, String STR) {
-        return takeOne(sequence, STR);
+//        String testSequence = "CAGATAGATAGATAGATAGAT",
+//                testSTR = "AGAT";
+//        return takeTwo(testSequence, testSTR);
+        return takeTwo(sequence, STR);
 
 
 
@@ -25,10 +33,36 @@ public class DNA {
 
     public static int takeFour(String sequence, String STR) {
 
+        int hashSTR = hash(STR);
+
+
+        return hashSTR;
     }
 
-    public static int hash(String in) {
+//    public static int index(String s, String find) {
+//        s.indexOf()
+//    }
 
+    public static int hash(String in) {
+        int out = 0;
+        for (int i = 0; i < in.length(); i++) {
+            out += getNumber(in.charAt(i)) * Math.pow(10, in.length()-1-i);
+        }
+        System.out.println(in);
+        System.out.println(out);
+        return out;
+    }
+
+    public static int getNumber(char c) {
+        if (c == 'A')
+            return A;
+        if (c == 'C')
+            return C;
+        if (c == 'G')
+            return G;
+        if (c == 'T')
+            return T;
+        return 0;
     }
 
 
@@ -65,14 +99,14 @@ public class DNA {
         int maxStreak = 0;
         int streak = 0;
         for (int i = 0; i < sequence.length(); i++) {
-            char c = sequence.charAt(i);
             for (int j = 0; j < STR.length(); j++) {
-                if (sequence.charAt(i+j) != STR.charAt(j)) {
+                if (i+j >= sequence.length() || sequence.charAt(i+j) != STR.charAt(j)) {
                     maxStreak = Math.max(maxStreak, streak);
                     streak = 0;
                     break;
                 } else if (j == STR.length()-1) {
                     streak++;
+                    i+=STR.length()-1;
                 }
             }
         }
