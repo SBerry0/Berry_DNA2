@@ -6,63 +6,83 @@
  * at Menlo School in Atherton, CA
  *</p>
  * <p>
- * Completed by: [YOUR NAME HERE]
+ * Completed by: Sohum Berry
  *</p>
  */
 
 public class DNA {
-    private static final int A = 1;
-    private static final int C = 2;
-    private static final int G = 3;
-    private static final int T = 4;
+    private static int[] VALUES = new int[256];
+//    private static final int A = 1;
+//    private static final int C = 2;
+//    private static final int G = 3;
+//    private static final int T = 4;
+    private static final int R = 4;
+    private static final int Q = 506683;
 
 
     /**
      * TODO: Complete this function, STRCount(), to return longest consecutive run of STR in sequence.
      */
     public static int STRCount(String sequence, String STR) {
-//        String testSequence = "CAGATAGATAGATAGATAGAT",
-//                testSTR = "AGAT";
-//        return takeTwo(testSequence, testSTR);
-        return takeTwo(sequence, STR);
+        String testSequence = "CAGATAGATAGATAGATAGAT",
+                testSTR = "AGAT";
+        return takeFour(testSequence, testSTR);
+//        return takeTwo(sequence, STR);
 
 
 
 //        return 0;
     }
 
+    // Hashing
     public static int takeFour(String sequence, String STR) {
+        VALUES['A'] = 0;
+        VALUES['C'] = 1;
+        VALUES['G'] = 2;
+        VALUES['T'] = 3;
+        int maxStreak = 0;
+        int nextIndex = STR.length();
+        int firstIndex = 0;
+        long strHash = hash(STR);
+        String window = sequence.substring(0, nextIndex);
+        long seqHash = hash(window);
 
-        int hashSTR = hash(STR);
+        for (int i = nextIndex; i < sequence.length(); i++) {
+            if (strHash == seqHash) {
 
+            }
+            seqHash = nextHash(seqHash, STR.length(), sequence.charAt(firstIndex), sequence.charAt(nextIndex));
+        }
 
-        return hashSTR;
+        return maxStreak;
+    }
+
+    public static long nextHash(long hash, int wordLength, char firstLetter, char nextLetter) {
+        hash = (long) ((hash+Q) - getNumber(firstLetter) * Math.pow(R, wordLength-1 % Q) % Q);
+        hash = ((hash * R) + getNumber(nextLetter)) % Q;
+        return hash;
     }
 
 //    public static int index(String s, String find) {
 //        s.indexOf()
 //    }
 
-    public static int hash(String in) {
-        int out = 0;
+
+
+
+    public static long hash(String in) {
+        long out = 0;
+//        long out = hash;
         for (int i = 0; i < in.length(); i++) {
-            out += getNumber(in.charAt(i)) * Math.pow(10, in.length()-1-i);
+            out = (R * out + getNumber(in.charAt(i))) % Q;
+//            out += getNumber(in.charAt(i)) * Math.pow(10, in.length()-1-i);
         }
-        System.out.println(in);
-        System.out.println(out);
         return out;
     }
 
     public static int getNumber(char c) {
-        if (c == 'A')
-            return A;
-        if (c == 'C')
-            return C;
-        if (c == 'G')
-            return G;
-        if (c == 'T')
-            return T;
-        return 0;
+        System.out.println(c);
+        return VALUES[c];
     }
 
 
@@ -75,7 +95,6 @@ public class DNA {
         }
         // binary search to find number of streaks that are maximized
         // wow this is jank
-        // how to make dupe of strings
         return takeThreeRecurse(sequence, totalRepeats, maxStreak/2, STR.length());
     }
 
@@ -93,7 +112,7 @@ public class DNA {
         }
     }
 
-    // unfinished and untested
+    // works pretty well (for the most part)
     // Character by character approach
     public static int takeTwo(String sequence, String STR) {
         int maxStreak = 0;
