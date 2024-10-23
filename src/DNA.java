@@ -26,95 +26,82 @@ public class DNA {
     public static int STRCount(String sequence, String STR) {
         String testSequence = "CAGATAGATAGATAGATAGAT",
                 testSTR = "AGAT";
-        return takeFour(testSequence, testSTR);
+//        return takeFour(testSequence, testSTR);
+        return takeFour(sequence, STR);
 //        return takeTwo(sequence, STR);
 
-
-
-//        return 0;
     }
 
-    // Hashing
+    // Solution with hashing
     public static int takeFour(String sequence, String STR) {
+        // Fill map with
         VALUES['A'] = 0;
+        VALUES['a'] = 0;
         VALUES['C'] = 1;
+        VALUES['c'] = 1;
         VALUES['G'] = 2;
+        VALUES['g'] = 2;
         VALUES['T'] = 3;
+        VALUES['t'] = 3;
+
+        int streak = 0;
         int maxStreak = 0;
-        int nextIndex = STR.length();
-        int firstIndex = 0;
-        long strHash = hash(STR);
-        String window = sequence.substring(0, nextIndex);
-        long seqHash = hash(window);
+        int index = STR.length();
 
-        for (int i = nextIndex; i < sequence.length(); i++) {
-            if (strHash == seqHash) {
+        long radixPow = 1;
+        for (int i = 1; i <= index - 1; i++) {
+            radixPow = (R * radixPow) % Q;
+        }
+//        System.out.println(radixPow);
+//        System.out.println(STR);
+        int seqLen = sequence.length();
+        long seqHash = hash(sequence, index);
+        long patHash = hash(STR, index);
 
+        for (int i = index; i < seqLen; i++) {
+            seqHash = (seqHash + Q - (radixPow * getNumber(sequence.charAt(i - index)) % Q)) % Q;
+            seqHash = (seqHash * R + getNumber(sequence.charAt(i))) % Q;
+            if (patHash == seqHash) {
+                // Increment the streak
+                streak++;
+                // Jump to the next character after the streak
+                i += STR.length() - 1;
+                // Continue calculating the hash one by one to catch up to the index
+                for (int j = 1; j < STR.length(); j++) {
+                    seqHash = (seqHash + Q - (radixPow * getNumber(sequence.charAt(i + j - index)) % Q)) % Q;
+                    seqHash = (seqHash * R + getNumber(sequence.charAt(i + j))) % Q;
+                }
+            } else if (streak > 0) {
+                // The streak is now broken, so reset the streak and update the maximum streak
+                maxStreak = Math.max(streak, maxStreak);
+                streak = 0;
             }
-            seqHash = nextHash(seqHash, STR.length(), sequence.charAt(firstIndex), sequence.charAt(nextIndex));
         }
 
         return maxStreak;
     }
 
-    public static long nextHash(long hash, int wordLength, char firstLetter, char nextLetter) {
-        hash = (long) ((hash+Q) - getNumber(firstLetter) * Math.pow(R, wordLength-1 % Q) % Q);
-        hash = ((hash * R) + getNumber(nextLetter)) % Q;
-        return hash;
-    }
-
-//    public static int index(String s, String find) {
-//        s.indexOf()
-//    }
-
-
-
-
-    public static long hash(String in) {
+    public static long hash(String in, int length) {
         long out = 0;
-//        long out = hash;
-        for (int i = 0; i < in.length(); i++) {
+        for (int i = 0; i < length; i++) {
+//            out = (long) (out + (Math.pow(R, in.length() - i-1) * getNumber(in.charAt(i))+1) % Q);
             out = (R * out + getNumber(in.charAt(i))) % Q;
+
 //            out += getNumber(in.charAt(i)) * Math.pow(10, in.length()-1-i);
         }
         return out;
     }
 
     public static int getNumber(char c) {
-        System.out.println(c);
-        return VALUES[c];
-    }
-
-
-    // good thinking thing but abandoning it
-    public static int takeThree(String sequence, String STR) {
-        int maxStreak = sequence.length() / STR.length();
-        String totalRepeats = "";
-        for (int i = 0; i < maxStreak; i++) {
-            totalRepeats += STR;
-        }
-        // binary search to find number of streaks that are maximized
-        // wow this is jank
-        return takeThreeRecurse(sequence, totalRepeats, maxStreak/2, STR.length());
-    }
-
-    public static int takeThreeRecurse(String sequence, String maxSTR, int numRepeats, int lenSTR) {
-        // can't figure out base case
-        //        if () {
-//            return numRepeats;
+//        if (VALUES[c] == 0 && c != 'A') {
+//            System.out.println("Oh dear, we have a: " + c);
 //        }
-        if (!sequence.contains(maxSTR.substring(maxSTR.length()-numRepeats*lenSTR))) {
-            // means substring is too long, split in half
-            return takeThreeRecurse(sequence, maxSTR, numRepeats/2, lenSTR);
-        } else {
-            // substring is not long enough, extend by half
-            return takeThreeRecurse(sequence, maxSTR, numRepeats+(numRepeats/2), lenSTR);
-        }
+        return VALUES[c];
     }
 
     // works pretty well (for the most part)
     // Character by character approach
-    public static int takeTwo(String sequence, String STR) {
+    public static int characterByCharacter(String sequence, String STR) {
         int maxStreak = 0;
         int streak = 0;
         for (int i = 0; i < sequence.length(); i++) {
@@ -127,39 +114,6 @@ public class DNA {
                     streak++;
                     i+=STR.length()-1;
                 }
-            }
-        }
-        return maxStreak;
-    }
-
-
-
-
-    // tested and abandoned
-    // indexOf approach
-    public static int takeOne(String sequence, String STR) {
-        int index = 0;
-        String checkString = STR;
-        int streak = 0;
-        int maxStreak = streak;
-        while (true) {
-            index = sequence.indexOf(checkString);
-            if (index == -1)
-                break;
-            sequence = sequence.substring(index+checkString.length());
-            streak++;
-            if (index+checkString.length()+1 >= sequence.length()) {
-                maxStreak = Math.max(streak, maxStreak);
-                break;
-            }
-//            System.out.println(checkString.charAt(0));
-//            System.out.println(sequence.charAt(index+checkString.length()+1));
-            if (sequence.charAt(0) != checkString.charAt(0)) {
-                maxStreak = Math.max(streak, maxStreak);
-                for (int i = 1; i < streak; i++) {
-                    checkString += checkString;
-                }
-                streak = 0;
             }
         }
         return maxStreak;
