@@ -20,11 +20,11 @@ public class DNA {
     private static final int Q = 506683;
 
     public static int STRCount(String sequence, String STR) {
-        return takeFour(sequence, STR);
+        return hashCounting(sequence, STR);
     }
 
     // Solution with hashing
-    public static int takeFour(String sequence, String STR) {
+    public static int hashCounting(String sequence, String STR) {
         // Fill map with appropriate variable and their values
         VALUES['A'] = A;
         VALUES['a'] = A;
@@ -90,7 +90,7 @@ public class DNA {
         return VALUES[c];
     }
 
-    // Character by character approach, works pretty well for the most part
+    // Character by character approach, actually much faster than the hashing technique
     public static int characterByCharacter(String sequence, String STR) {
         int maxStreak = 0;
         int streak = 0;
@@ -110,6 +110,6 @@ public class DNA {
                 }
             }
         }
-        return maxStreak;
+        return Math.max(maxStreak, streak);
     }
 }
