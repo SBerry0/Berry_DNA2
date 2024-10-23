@@ -19,17 +19,8 @@ public class DNA {
     private static final int R = 4;
     private static final int Q = 506683;
 
-
-    /**
-     * TODO: Complete this function, STRCount(), to return longest consecutive run of STR in sequence.
-     */
     public static int STRCount(String sequence, String STR) {
-        String testSequence = "CAGATAGATAGATAGATAGAT",
-                testSTR = "AGAT";
-//        return takeFour(testSequence, testSTR);
         return takeFour(sequence, STR);
-//        return takeTwo(sequence, STR);
-
     }
 
     // Solution with hashing
